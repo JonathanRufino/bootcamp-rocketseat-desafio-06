@@ -34,6 +34,7 @@ class User extends Component {
     loading: true,
     page: 1,
     loadingMore: false,
+    refreshing: false,
   };
 
   async componentDidMount() {
@@ -67,9 +68,20 @@ class User extends Component {
     });
   };
 
+  refreshList = async () => {
+    const { navigation } = this.props;
+    const user = navigation.getParam('user');
+
+    this.setState({ refreshing: true });
+
+    const response = await api.get(`/users/${user.login}/starred`);
+
+    this.setState({ stars: response.data, refreshing: false, page: 1 });
+  };
+
   render() {
     const { navigation } = this.props;
-    const { stars, loading, loadingMore } = this.state;
+    const { stars, loading, loadingMore, refreshing } = this.state;
 
     const user = navigation.getParam('user');
 
@@ -89,6 +101,8 @@ class User extends Component {
             keyExtractor={star => String(star.id)}
             onEndReachedThreshold={0.2}
             onEndReached={this.loadMore}
+            onRefresh={this.refreshList}
+            refreshing={refreshing}
             ListFooterComponent={loadingMore && <Loading />}
             renderItem={({ item }) => (
               <Starred>
