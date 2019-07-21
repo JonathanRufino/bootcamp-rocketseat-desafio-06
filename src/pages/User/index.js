@@ -26,6 +26,7 @@ class User extends Component {
   static propTypes = {
     navigation: PropTypes.shape({
       getParam: PropTypes.func,
+      navigate: PropTypes.func,
     }).isRequired,
   };
 
@@ -79,6 +80,12 @@ class User extends Component {
     this.setState({ stars: response.data, refreshing: false, page: 1 });
   };
 
+  handleNavigate = repository => {
+    const { navigation } = this.props;
+
+    navigation.navigate('Repository', { repository });
+  };
+
   render() {
     const { navigation } = this.props;
     const { stars, loading, loadingMore, refreshing } = this.state;
@@ -105,7 +112,7 @@ class User extends Component {
             refreshing={refreshing}
             ListFooterComponent={loadingMore && <Loading />}
             renderItem={({ item }) => (
-              <Starred>
+              <Starred onPress={() => this.handleNavigate(item)}>
                 <OwnerAvatar source={{ uri: item.owner.avatar_url }} />
 
                 <Info>
